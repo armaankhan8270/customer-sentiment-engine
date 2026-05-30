@@ -6,7 +6,7 @@ An enterprise-grade, 7-phase **Customer Feedback & Sentiment Analytics Engine** 
 
 ## 🏗️ Architectural Overview & Flow
 <img width="1693" height="929" alt="ChatGPT Image May 31, 2026, 12_00_41 AM" src="https://github.com/user-attachments/assets/cf11b428-087d-4c4c-80bc-c6b40d688073" />
-<img width="1900" height="813" alt="Screenshot 2026-05-31 001257" src="https://github.com/user-attachments/assets/5d922c04-8e37-4ec3-8b1e-87cc283d589b" />
+
 The system processes unstructured customer feedback channels (Web surveys, App Store, Support tickets) through an automated ELT pipeline:
 
 ```mermaid
@@ -171,3 +171,4 @@ python -m http.server 8001
 ### ❓ How the HTML UI and FastAPI Interact
 * **Separate Running Services:** Yes, they must run together. The HTML page contains JavaScript code (`index.html`) that queries `http://127.0.0.1:8000/api/metrics` and `http://127.0.0.1:8000/api/feedback` to dynamically retrieve real-time Snowflake KPI data.
 * **If the FastAPI server is stopped:** The dashboard will render a premium connection loss screen and prompt you to run the Uvicorn command to restore the active state.
+<img width="1000" height="813" alt="Screenshot 2026-05-31 001257" src="https://github.com/user-attachments/assets/5d922c04-8e37-4ec3-8b1e-87cc283d589b" />
