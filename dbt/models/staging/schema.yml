@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_customer_feedback
+    description: "Standardized customer feedback lines parsed from Bronze raw JSON tables."
+    columns:
+      - name: feedback_id
+        description: "Primary key identifying each individual feedback record."
+        tests:
+          - unique
+          - not_null
+          
+      - name: customer_id
+        description: "Foreign natural key referencing individual consumers."
+        tests:
+          - not_null
+          
+      - name: rating
+        description: "Review score given by customer, ranging from 1 to 5."
+        tests:
+          - not_null

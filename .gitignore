@@ -1,0 +1,24 @@
+# Environmental secrets containing credentials
+.env
+
+# Python compilation and runtime caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# dbt compilation, logs, and package targets
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Local data cache (prevent committing heavy raw files)
+data/**/*.csv
+data/**/*.json
+data/**/*.xml
+data/**/*.parquet
+!data/raw/.gitkeep

@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ env_var('SNOWFLAKE_DATABASE', 'CUSTOMER_FEEDBACK_DB') }}"
+    schema: RAW
+    tables:
+      - name: customer_feedback_raw
+        description: "Raw semi-structured JSON records from customer feedback channels hosted on AWS S3."

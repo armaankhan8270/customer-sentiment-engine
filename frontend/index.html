@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Feedback & Sentiment Control Room</title>
+    
+    <!-- Premium Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN for beautiful UI symbols -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ==============================================================================
+           1. Dynamic Design Tokens (Vanilla CSS variables)
+           ============================================================================== */
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0d1117 0%, #07090e 100%);
+            --glass-bg: rgba(13, 17, 23, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            
+            --primary: #5865f2;
+            --primary-glow: rgba(88, 101, 242, 0.45);
+            
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.25);
+            
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.25);
+            
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.35);
+            
+            --text-main: #f3f4f6;
+            --text-muted: #8b949e;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ==============================================================================
+           2. Reset & Layout Structure
+           ============================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 2.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ==============================================================================
+           3. Glassmorphic Cards & UI Elements
+           ============================================================================== */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background-image: linear-gradient(135deg, var(--glass-highlight), transparent);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* ==============================================================================
+           4. Control Room Header
+           ============================================================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-section h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff 0%, #8b949e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.35rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: currentColor;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* ==============================================================================
+           5. KPIs Metrics Grid
+           ============================================================================== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            padding: 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            opacity: 0.5;
+        }
+
+        .metric-card.success-card::after { background: var(--success); }
+        .metric-card.warning-card::after { background: var(--warning); }
+        .metric-card.danger-card::after { background: var(--danger); }
+
+        .metric-info h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-info .value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            color: #ffffff;
+        }
+
+        .metric-icon-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .success-card .metric-icon-box { color: var(--success); }
+        .warning-card .metric-icon-box { color: var(--warning); }
+        .danger-card .metric-icon-box { color: var(--danger); }
+
+        /* ==============================================================================
+           6. Layout Core: Alerts & Feed Table
+           ============================================================================== */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1.75rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==============================================================================
+           7. Real-Time Alerts Panel (Left Column)
+           ============================================================================== */
+        .alerts-panel {
+            padding: 1.5rem;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+
+        .alerts-panel h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ffffff;
+        }
+
+        .alert-card {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .alert-card:hover {
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-header .cust-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .alert-badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            animation: pulse-danger 1.8s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .alert-card .product {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-card .text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .alert-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--danger);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 0 6px 6px 0;
+            color: #d1d5db;
+        }
+
+        /* ==============================================================================
+           8. Feedback Directory Directory (Right Column)
+           ============================================================================== */
+        .feedback-directory {
+            padding: 1.75rem;
+        }
+
+        .directory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .directory-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Custom Table Design */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.9rem;
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Badge Channels styling */
+        .channel-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+        }
+
+        .channel-badge.web { color: #60a5fa; border-color: rgba(96, 165, 250, 0.2); background: rgba(96, 165, 250, 0.05); }
+        .channel-badge.support { color: #c084fc; border-color: rgba(192, 132, 252, 0.2); background: rgba(192, 132, 252, 0.05); }
+        .channel-badge.survey { color: #fb7185; border-color: rgba(251, 113, 133, 0.2); background: rgba(251, 113, 133, 0.05); }
+        .channel-badge.app { color: #34d399; border-color: rgba(52, 211, 153, 0.2); background: rgba(52, 211, 153, 0.05); }
+
+        /* Sentiment Value Badges */
+        .sentiment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .sentiment-badge.positive { color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .sentiment-badge.neutral { color: var(--warning); background: rgba(245, 158, 11, 0.1); }
+        .sentiment-badge.negative { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+        /* Rating Stars */
+        .stars-container {
+            color: #fbbf24;
+            display: flex;
+            gap: 0.1rem;
+        }
+
+        /* Collapsible summary container */
+        .summary-box {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border-left: 2px solid var(--primary);
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: #d1d5db;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==============================================================================
+           9. Connection Error Handling Modal Overlay
+           ============================================================================== */
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 2rem;
+        }
+
+        .error-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .error-modal {
+            max-width: 600px;
+            width: 100%;
+            padding: 2.5rem;
+            text-align: center;
+            border-color: rgba(239, 68, 68, 0.25);
+            box-shadow: 0 0 50px rgba(239, 68, 68, 0.15);
+        }
+
+        .error-modal-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .error-modal h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .error-modal p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-box {
+            background: #05070a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--warning);
+            text-align: left;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .retry-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .retry-btn:hover {
+            background: #4752c4;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        /* ==============================================================================
+           10. Loading Skeleton Animations
+           ============================================================================== */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 6px;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Header -->
+        <header>
+            <div class="brand-section">
+                <h1>Feedback AI Sentiment Control Room</h1>
+                <p>
+                    <i data-lucide="shield-check" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                    Real-time Snowflake Cortex AI Analytics Interface
+                </p>
+            </div>
+            
+            <div id="connection-status" class="status-badge">
+                <span class="pulse-dot"></span>
+                <span>Connecting to API...</span>
+            </div>
+        </header>
+
+        <!-- KPI Summary Cards -->
+        <section class="metrics-grid">
+            
+            <!-- Total Reviews Count -->
+            <div class="glass-card metric-card">
+                <div class="metric-info">
+                    <h3>Total Ingested</h3>
+                    <div id="kpi-total" class="value">0</div>
+                </div>
+                <div class="metric-icon-box">
+                    <i data-lucide="database" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+
+            <!-- Average Star Rating -->
+            <div class="glass-card metric-card warning-card">
+                <div class="metric-info">
+                    <h3>Avg Rating</h3>
+                    <div id="kpi-rating" class="value">0.0</div>
+                </div>
+                <div class="metric-icon-box">
+                    <i data-lucide="star" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+
+            <!-- Aggregate Sentiment Score -->
+            <div class="glass-card metric-card success-card" id="sentiment-kpi-card">
+                <div class="metric-info">
+                    <h3>Net Sentiment</h3>
+                    <div id="kpi-sentiment" class="value">0.000</div>
+                </div>
+                <div class="metric-icon-box">
+                    <i data-lucide="smile" id="sentiment-kpi-icon" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+
+            <!-- Positive Ratio percentage -->
+            <div class="glass-card metric-card success-card">
+                <div class="metric-info">
+                    <h3>Positive Ratio</h3>
+                    <div id="kpi-ratio" class="value">0.0%</div>
+                </div>
+                <div class="metric-icon-box">
+                    <i data-lucide="percent" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Main Workspace: Left Column (Alerts), Right Column (Directory Table) -->
+        <main class="main-layout">
+            
+            <!-- Left Panel: Real-time Crimson negative sentiment alerts -->
+            <div class="glass-card alerts-panel">
+                <h2>
+                    <i data-lucide="alert-octagon" style="color: var(--danger); width: 20px; height: 20px;"></i>
+                    Critical Alerts
+                </h2>
+                <div id="alerts-container">
+                    <!-- Loaded dynamically via javascript -->
+                </div>
+            </div>
+
+            <!-- Right Panel: Full transactional logs feedback directory -->
+            <div class="glass-card feedback-directory">
+                <div class="directory-header">
+                    <h2>Feedback Logs Directory</h2>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Consumer / Product</th>
+                                <th>Rating</th>
+                                <th>Feedback Text & AI Abstract</th>
+                                <th>AI Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-table-body">
+                            <!-- Loaded dynamically via javascript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Connection Error modal window overlay -->
+    <div id="error-overlay" class="error-overlay">
+        <div class="glass-card error-modal">
+            <div class="error-modal-icon">
+                <i data-lucide="wifi-off" style="width: 38px; height: 38px;"></i>
+            </div>
+            <h3>API Connection Terminated</h3>
+            <p>
+                The dashboard failed to communicate with the FastAPI backend engine. 
+                Please verify that the Uvicorn server is running locally on port 8000.
+            </p>
+            <div class="code-box">
+                uvicorn scripts.api_server:app --reload
+            </div>
+            <button class="retry-btn" onclick="fetchDashboardData()">Retry Connection</button>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Initialize Lucide vector icons
+        lucide.createIcons();
+
+        const API_BASE = "http://127.0.0.1:8000";
+
+        /**
+         * Dynamic Star renderer helper
+         * @param {number} rating count
+         */
+        function renderStars(rating) {
+            let html = '<div class="stars-container">';
+            for(let i=1; i<=5; i++) {
+                if(i <= rating) {
+                    html += '<i data-lucide="star" style="width: 14px; height: 14px; fill: currentColor;"></i>';
+                } else {
+                    html += '<i data-lucide="star" style="width: 14px; height: 14px; opacity: 0.25;"></i>';
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        /**
+         * Channel badge CSS utility mapper
+         */
+        function getChannelClass(channel) {
+            const chan = channel.toLowerCase();
+            if(chan.includes("web")) return "web";
+            if(chan.includes("support")) return "support";
+            if(chan.includes("survey")) return "survey";
+            return "app";
+        }
+
+        /**
+         * Sentiment badge styling utility
+         */
+        function renderSentimentBadge(score) {
+            const numScore = Number(score || 0);
+            if(numScore >= 0.25) {
+                return `<span class="sentiment-badge positive"><i data-lucide="trending-up" style="width: 12px; height: 12px;"></i> +${numScore.toFixed(3)}</span>`;
+            } else if(numScore <= -0.25) {
+                return `<span class="sentiment-badge negative"><i data-lucide="trending-down" style="width: 12px; height: 12px;"></i> ${numScore.toFixed(3)}</span>`;
+            } else {
+                return `<span class="sentiment-badge neutral"><i data-lucide="minus" style="width: 12px; height: 12px;"></i> ${numScore.toFixed(3)}</span>`;
+            }
+        }
+
+        /**
+         * Injects skeleton loaders while fetching database streams
+         */
+        function renderLoadingSkeletons() {
+            // Metrics skeletons
+            document.getElementById("kpi-total").innerText = "...";
+            document.getElementById("kpi-rating").innerText = "...";
+            document.getElementById("kpi-sentiment").innerText = "...";
+            document.getElementById("kpi-ratio").innerText = "...";
+
+            // Alerts skeletons
+            let alertHtml = '';
+            for(let i=0; i<2; i++) {
+                alertHtml += `
+                    <div class="alert-card" style="opacity: 0.65;">
+                        <div class="skeleton" style="height: 16px; width: 65%; margin-bottom: 0.5rem;"></div>
+                        <div class="skeleton" style="height: 12px; width: 45%; margin-bottom: 0.5rem;"></div>
+                        <div class="skeleton" style="height: 35px; width: 100%;"></div>
+                    </div>
+                `;
+            }
+            document.getElementById("alerts-container").innerHTML = alertHtml;
+
+            // Table body skeletons
+            let tableHtml = '';
+            for(let i=0; i<3; i++) {
+                tableHtml += `
+                    <tr>
+                        <td><div class="skeleton" style="height: 22px; width: 80px;"></div></td>
+                        <td>
+                            <div class="skeleton" style="height: 15px; width: 110px; margin-bottom: 0.4rem;"></div>
+                            <div class="skeleton" style="height: 12px; width: 80px;"></div>
+                        </td>
+                        <td><div class="skeleton" style="height: 14px; width: 70px;"></div></td>
+                        <td>
+                            <div class="skeleton" style="height: 30px; width: 100%; margin-bottom: 0.5rem;"></div>
+                            <div class="skeleton" style="height: 25px; width: 100%;"></div>
+                        </td>
+                        <td><div class="skeleton" style="height: 22px; width: 65px;"></div></td>
+                    </tr>
+                `;
+            }
+            document.getElementById("feedback-table-body").innerHTML = tableHtml;
+        }
+
+        /**
+         * Orchestration Core: Pull data endpoints from FastAPI backend
+         */
+        async function fetchDashboardData() {
+            renderLoadingSkeletons();
+            
+            const errorOverlay = document.getElementById("error-overlay");
+            const connectionStatus = document.getElementById("connection-status");
+            
+            try {
+                // 1. Fetch KPI Metrics
+                const metricsResponse = await fetch(`${API_BASE}/api/metrics`);
+                if(!metricsResponse.ok) throw new Error("Metrics endpoint failed");
+                const metrics = await metricsResponse.json();
+                
+                // Update KPI text fields
+                document.getElementById("kpi-total").innerText = metrics.total_reviews || 0;
+                document.getElementById("kpi-rating").innerText = Number(metrics.average_rating || 0).toFixed(2);
+                
+                const avgSentiment = Number(metrics.average_sentiment || 0);
+                document.getElementById("kpi-sentiment").innerText = avgSentiment.toFixed(3);
+                document.getElementById("kpi-ratio").innerText = `${Number(metrics.positive_ratio || 0).toFixed(1)}%`;
+
+                // Adapt net sentiment card background based on score
+                const sentimentCard = document.getElementById("sentiment-kpi-card");
+                const sentimentIcon = document.getElementById("sentiment-kpi-icon");
+                
+                sentimentCard.className = "glass-card metric-card";
+                if(avgSentiment >= 0.1) {
+                    sentimentCard.classList.add("success-card");
+                    sentimentIcon.setAttribute("data-lucide", "smile");
+                } else if(avgSentiment <= -0.1) {
+                    sentimentCard.classList.add("danger-card");
+                    sentimentIcon.setAttribute("data-lucide", "frown");
+                } else {
+                    sentimentCard.classList.add("warning-card");
+                    sentimentIcon.setAttribute("data-lucide", "meh");
+                }
+
+                // 2. Fetch Alerts (Sentiment <= -0.5)
+                const alertsResponse = await fetch(`${API_BASE}/api/alerts`);
+                if(!alertsResponse.ok) throw new Error("Alerts endpoint failed");
+                const alerts = await alertsResponse.json();
+                
+                let alertsHtml = '';
+                if(alerts.length === 0) {
+                    alertsHtml = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <i data-lucide="check-circle" style="color: var(--success); width: 38px; height: 38px; margin-bottom: 0.5rem; display: block; margin: 0 auto 0.5rem auto;"></i>
+                            <span style="font-size: 0.9rem; font-weight: 500;">Zero Critical Alerts</span>
+                        </div>
+                    `;
+                } else {
+                    alerts.forEach(item => {
+                        alertsHtml += `
+                            <div class="alert-card">
+                                <div class="alert-header">
+                                    <span class="cust-name">${item.customer_name}</span>
+                                    <span class="alert-badge">CRITICAL</span>
+                                </div>
+                                <div class="product">${item.product_name}</div>
+                                <div class="text">"${item.feedback_text}"</div>
+                                <div class="alert-summary">
+                                    <strong>AI Summary:</strong> ${item.review_summary}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById("alerts-container").innerHTML = alertsHtml;
+
+                // 3. Fetch Full feedback log list
+                const feedbackResponse = await fetch(`${API_BASE}/api/feedback`);
+                if(!feedbackResponse.ok) throw new Error("Feedback endpoint failed");
+                const feedback = await feedbackResponse.json();
+                
+                let tableHtml = '';
+                if(feedback.length === 0) {
+                    tableHtml = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                No feedback records found in the Gold table.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    feedback.forEach(item => {
+                        tableHtml += `
+                            <tr>
+                                <td>
+                                    <span class="channel-badge ${getChannelClass(item.channel)}">${item.channel}</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: #ffffff;">${item.customer_name}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${item.product_name}</div>
+                                </td>
+                                <td>
+                                    ${renderStars(item.rating)}
+                                </td>
+                                <td>
+                                    <div style="line-height: 1.5; color: var(--text-main);">"${item.feedback_text}"</div>
+                                    <div class="summary-box">
+                                        <div class="summary-title">AI In-Warehouse Summary</div>
+                                        ${item.review_summary}
+                                    </div>
+                                </td>
+                                <td>
+                                    ${renderSentimentBadge(item.sentiment_score)}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById("feedback-table-body").innerHTML = tableHtml;
+
+                // Connection Succeeded: Restore indicators
+                errorOverlay.classList.remove("active");
+                connectionStatus.className = "status-badge";
+                connectionStatus.innerHTML = '<span class="pulse-dot"></span><span>Control Room Online</span>';
+                
+                // Re-render Lucide vector icons dynamically
+                lucide.createIcons();
+
+            } catch (error) {
+                console.error("Dashboard failed to connect to local API server:", error);
+                // Activate fallback error modal overlays
+                errorOverlay.classList.add("active");
+                connectionStatus.className = "status-badge offline";
+                connectionStatus.innerHTML = '<span class="pulse-dot"></span><span>Control Room Offline</span>';
+                lucide.createIcons();
+            }
+        }
+
+        // Boot initial payload load on launch
+        window.addEventListener("DOMContentLoaded", fetchDashboardData);
+    </script>
+</body>
+</html>

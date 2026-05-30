@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: fct_customer_feedback
+    description: "Enriched customer feedback analytics records containing Cortex AI sentiments and summaries."
+    columns:
+      - name: feedback_id
+        description: "Primary key for the feedback analytics mart."
+        tests:
+          - unique
+          - not_null
+          
+      - name: customer_id
+        description: "Foreign natural key representing the customer."
+        tests:
+          - not_null
+          
+      - name: sentiment_score
+        description: "AI-computed score tracking sentiment severity ranging from -1.0 to 1.0."
+        
+      - name: review_summary
+        description: "AI-distilled summary paragraph of the consumer review text."

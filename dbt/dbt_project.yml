@@ -1,0 +1,31 @@
+name: 'customer_sentiment'
+version: '1.0.0'
+config-version: 2
+
+# Connection profile name mapping to profiles.yml
+profile: 'snowflake_customer_sentiment'
+
+# Path structures for dbt execution
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Medallion Architecture Schema Configurations
+models:
+  customer_sentiment:
+    # Staging Layer (Silver) - Cleans, standardizes raw columns
+    staging:
+      +schema: staging
+      +materialized: view
+      
+    # Marts Layer (Gold) - Enriched reviews and aggregations
+    marts:
+      +schema: mart
+      +materialized: table

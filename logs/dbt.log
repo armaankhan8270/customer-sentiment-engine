@@ -1,0 +1,14 @@
+[0m23:19:49.498517 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A80B42AB70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A80AB31280>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A807AA5A90>]}
+
+
+============================== 23:19:49.517947 | a8979481-0a10-4e7f-a854-8e4676c4033b ==============================
+[0m23:19:49.517947 [info ] [MainThread]: Running with dbt=1.8.5
+[0m23:19:49.517947 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\amaan\\.dbt', 'fail_fast': 'False', 'warn_error': 'None', 'log_path': 'logs', 'version_check': 'True', 'debug': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'False', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'introspect': 'True', 'invocation_command': 'dbt run', 'target_path': 'None', 'log_format': 'default', 'send_anonymous_usage_stats': 'True'}
+[0m23:19:49.534242 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\amaan\Downloads\test\ebookify\ecommerce\customer-sentiment-engine\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m23:19:49.542427 [debug] [MainThread]: Command `dbt run` failed at 23:19:49.540886 after 0.37 seconds
+[0m23:19:49.542941 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A80B445730>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A80B59D970>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A80B42AB70>]}
+[0m23:19:49.542941 [debug] [MainThread]: Flushing usage events
