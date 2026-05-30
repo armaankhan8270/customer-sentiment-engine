@@ -171,4 +171,4 @@ python -m http.server 8001
 ### ❓ How the HTML UI and FastAPI Interact
 * **Separate Running Services:** Yes, they must run together. The HTML page contains JavaScript code (`index.html`) that queries `http://127.0.0.1:8000/api/metrics` and `http://127.0.0.1:8000/api/feedback` to dynamically retrieve real-time Snowflake KPI data.
 * **If the FastAPI server is stopped:** The dashboard will render a premium connection loss screen and prompt you to run the Uvicorn command to restore the active state.
-<img width="1000" height="813" alt="Screenshot 2026-05-31 001257" src="https://github.com/user-attachments/assets/5d922c04-8e37-4ec3-8b1e-87cc283d589b" />
+<img width="500" height="500" alt="Screenshot 2026-05-31 001257" src="https://github.com/user-attachments/assets/5d922c04-8e37-4ec3-8b1e-87cc283d589b" />
