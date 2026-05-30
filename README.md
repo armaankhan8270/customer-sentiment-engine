@@ -5,7 +5,8 @@ An enterprise-grade, 7-phase **Customer Feedback & Sentiment Analytics Engine** 
 ---
 
 ## 🏗️ Architectural Overview & Flow
-
+<img width="1693" height="929" alt="ChatGPT Image May 31, 2026, 12_00_41 AM" src="https://github.com/user-attachments/assets/cf11b428-087d-4c4c-80bc-c6b40d688073" />
+<img width="1900" height="813" alt="Screenshot 2026-05-31 001257" src="https://github.com/user-attachments/assets/5d922c04-8e37-4ec3-8b1e-87cc283d589b" />
 The system processes unstructured customer feedback channels (Web surveys, App Store, Support tickets) through an automated ELT pipeline:
 
 ```mermaid
@@ -158,6 +159,7 @@ python -m uvicorn scripts.api_server:app --reload --port 8000
 
 ### 2. Launch the Frontend UI Dashboard
 With the FastAPI backend running, open a **separate terminal window** to start the frontend service:
+
 
 ```bash
 cd frontend
